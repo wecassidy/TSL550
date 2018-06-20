@@ -187,3 +187,39 @@ class TSL550:
             "trigger": mode_settings[2],
             "const_freq_step": mode_settings[3]
         }
+
+    def sweep_start_wavelength(self, val=None):
+        if val is not None:
+            command = "SS{:.4f}".format(val)
+        else:
+            command = "SS"
+
+        response = self.write(command)
+        return float(response)
+
+    def sweep_start_frequency(self, val=None):
+        if val is not None:
+            command = "FS{:.5f}".format(val)
+        else:
+            command = "FS"
+
+        response = self.write(command)
+        return float(response)
+
+    def sweep_end_wavelength(self, val=None):
+        if val is not None:
+            command = "SE{:.4f}".format(val)
+        else:
+            command = "SE"
+
+        response = self.write(command)
+        return float(response)
+
+    def sweep_end_frequency(self, val=None):
+        if val is not None:
+            command = "FF{:.5f}".format(val)
+        else:
+            command = "FF"
+
+        response = self.write(command)
+        return float(response)
