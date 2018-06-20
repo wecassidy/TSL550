@@ -55,3 +55,21 @@ class TSL550:
 
         self.on = False
         self.write("LF")
+
+    def wavelength(self, val=None):
+        """
+        Tune the laser to a new wavelength. If a value is not
+        specified, return the current one. Units: nm.
+        """
+
+        response = self.write("WA{}".format(val))
+        return float(response)
+
+    def frequency(self, val=None):
+        """
+        Tune the laser to a new wavelength. If a value is not
+        specified, return the current one. Units: THz.
+        """
+
+        response = self.write("FQ{}".format(val))
+        return float(response)
