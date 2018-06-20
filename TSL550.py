@@ -19,6 +19,9 @@ class TSL550:
         # Make sure the laser is off
         self.off()
 
+        # Set power management to auto
+        self.power_auto()
+
     def write(self, command):
         """
         Write a command to the TSL550. Returns the response (if any).
@@ -83,3 +86,43 @@ class TSL550:
 
         response = self.write(command)
         return float(response)
+
+    def power_mW(self, val=None):
+        """
+        Set the output optical power in milliwatts. If a value is not
+        specified, return the current one.
+        """
+
+        if val is not None:
+            command = "LP{:.2f}".format(val)
+        else:
+            command = "LP"
+
+        response = self.write(command)
+        return float(response)
+
+    def power_dBm(self, val=None):
+        """
+        Set the output optical power in decibel-milliwatts. If a value
+        is not specified, return the current one.
+        """
+
+        if val is not None:
+            command = "OP{:.2f}".format(val)
+        else:
+            command = "OP"
+
+        response = self.write(command)
+        return float(response)
+
+    def power_auto(self):
+        """Turn on automatic power control."""
+
+        self.power_control = "auto"
+        self.write("AF")
+
+    def power_manual(self):
+        """Turn on manual power control."""
+
+        self.power_control = "manual"
+        self.write("AO")
