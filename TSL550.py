@@ -3,6 +3,23 @@ import sys
 import serial
 
 class TSL550:
+    # continuous, two-way, trigger, constant frequency interval
+    SWEEP_MODE_MAP = {
+        (True, False, False, False): 1,
+        (True, True, False, False): 2,
+        (False, False, False, False): 3,
+        (False, True, False, False): 4,
+        (False, False, False, True): 5,
+        (False, True, False, True): 6,
+        (True, False, True, False): 7,
+        (True, True, True, False): 8,
+        (False, False, True, False): 9,
+        (False, True, True, False): 10,
+        (False, False, True, True): 11,
+        (False, True, True, True): 12
+    }
+    SWEEP_MODE_MAP_REV = {num: settings for settings, num in SWEEP_MODE_MAP.items()}
+
     def __init__(self, address, baudrate=9600, terminator="\r"):
         """
         Connect to the TSL550. Address is the serial port, baudrate
@@ -17,10 +34,15 @@ class TSL550:
         self.terminator = terminator
 
         # Make sure the laser is off
+        self.is_on = False
         self.off()
 
         # Set power management to auto
+        self.power_control = "auto"
         self.power_auto()
+
+        # Set sweep mode to continuous, two-way, trigger off
+        self.sweep_set_mode()
 
     def write(self, command):
         """
@@ -126,3 +148,42 @@ class TSL550:
 
         self.power_control = "manual"
         self.write("AO")
+
+    def sweep_set_mode(self, continuous=True, twoway=True, trigger=False, const_freq_step=False):
+        r"""
+        Set the mode of the sweep. Options:
+
+        - Continuous or stepwise:
+                /        _|
+               /  vs   _|
+              /      _|
+        - Two-way:
+                /\        /   /
+               /  \  vs  /   /
+              /    \    /   /
+        - Constant frequency interval (requires stepwise mode)
+        - Start from external trigger
+        """
+
+        try:
+            mode = TSL550.SWEEP_MODE_MAP[(continuous, twoway, trigger, const_freq_step)]
+        except KeyError:
+            raise AttributeError("Invalid sweep configuration.")
+
+        self.write("SM{}".format(mode))
+
+    def sweep_get_mode(self):
+        """
+        Return the current sweep configuration as a dictionary. See
+        sweep_set_mode for what the parameters mean.
+        """
+
+        mode_num = int(self.write("SM"))
+        mode_settings = TSL550.SWEEP_MODE_MAP_REV[mode_num]
+
+        return {
+            "continuous": mode_settings[0],
+            "twoway": mode_settings[1],
+            "trigger": mode_settings[2],
+            "const_freq_step": mode_settings[3]
+        }
