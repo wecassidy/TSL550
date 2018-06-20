@@ -62,7 +62,12 @@ class TSL550:
         specified, return the current one. Units: nm.
         """
 
-        response = self.write("WA{}".format(val))
+        if val is not None:
+            command = "WA{:.4f}".format(val) # Put the value rounded to 4 decimal places
+        else:
+            command = "WA"
+
+        response = self.write(command)
         return float(response)
 
     def frequency(self, val=None):
@@ -71,5 +76,10 @@ class TSL550:
         specified, return the current one. Units: THz.
         """
 
-        response = self.write("FQ{}".format(val))
+        if val is not None:
+            command = "FQ{:.4f}".format(val) # Put the value rounded to 4 decimal places
+        else:
+            command = "FQ"
+
+        response = self.write(command)
         return float(response)
