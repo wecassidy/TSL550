@@ -10,7 +10,7 @@ class TSL550:
         the end of the command.
         """
 
-        self.device = serial.Serial(address, baudrate=baudrate, timeout=None)
+        self.device = serial.Serial(address, baudrate=baudrate, timeout=0)
 
         if sys.version_info.major >= 3: # Python 3 compatibility: convert to bytes
             terminator = terminator.encode("ASCII")
@@ -47,13 +47,13 @@ class TSL550:
     def on(self):
         """Turn on the laser diode"""
 
-        self.on = True
+        self.is_on = True
         self.write("LO")
 
     def off(self):
         """Turn off the laser diode"""
 
-        self.on = False
+        self.is_on = False
         self.write("LF")
 
     def wavelength(self, val=None):
