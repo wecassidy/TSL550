@@ -13,6 +13,9 @@ class TSL550:
         self.device = serial.Serial(address, baudrate=baudrate, timeout=1)
         self.terminator = terminator
 
+        # Make sure the laser is off
+        self.off()
+
     def write(self, command):
         """
         Write a command to the TSL550. Returns the response (if any).
@@ -32,3 +35,15 @@ class TSL550:
         response = self.device.readlines()
 
         return response
+
+    def on(self):
+        """Turn on the laser diode"""
+
+        self.on = True
+        self.write("LO")
+
+    def off(self):
+        """Turn off the laser diode"""
+
+        self.on = False
+        self.write("LF")
