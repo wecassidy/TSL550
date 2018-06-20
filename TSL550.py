@@ -10,7 +10,10 @@ class TSL550:
         the end of the command.
         """
 
-        self.device = serial.Serial(address, baudrate=baudrate, timeout=1)
+        self.device = serial.Serial(address, baudrate=baudrate, timeout=None)
+
+        if sys.version_info.major >= 3: # Python 3 compatibility: convert to bytes
+            terminator = terminator.encode("ASCII")
         self.terminator = terminator
 
         # Make sure the laser is off
@@ -21,18 +24,23 @@ class TSL550:
         Write a command to the TSL550. Returns the response (if any).
         """
 
-        # Add the terminator
-        command = command + self.terminator
-
         # Convert to bytes (Python 3 compatibility)
         if sys.version_info.major >= 3:
             command = command.encode("ASCII")
 
         # Write the command
-        self.device.write(command)
+        self.device.write(command + self.terminator)
 
         # Read response
-        response = self.device.readlines()
+        response = ""
+        in_byte = self.device.read()
+        while in_byte != self.terminator:
+            if sys.version_info.major >= 3:
+                response += in_byte.decode("ASCII")
+            else:
+                response += in_byte
+
+            in_byte = self.device.read()
 
         return response
 
