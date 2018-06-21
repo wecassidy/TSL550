@@ -149,6 +149,31 @@ class TSL550:
 
     def sweep_wavelength(self, start, stop, duration, number=1, delay=0
                          continuous=True, step_size=1, twoway=True, trigger=False):
+        """
+        Conduct a sweep between two wavelengths. This method goes from
+        the start wavelength to the stop wavelength (units:
+        manometres) in the time specified by duration (units:
+        seconds). The sweep is then repeated the number of times set
+        in the number parameter.
+
+        If delay (units: seconds) is specified, there is a pause of
+        that duration between each sweep.
+
+        If the parameter continuous is False, then the sweep will be
+        conducted in steps of fixed size as set by the step_size
+        parameter (units: nanometres).
+
+        If the twoway parameter is True then one sweep is considered
+        to be going from the start wavelength to the stop wavelength
+        and then back to the start; if it is False then one sweep
+        consists only of going from the start to the top, and the
+        laser will simply jump back to the start wavelength at the
+        start of the next sweep.
+
+        If the trigger parameter is False then the sweep will execute
+        immediately. If it is true, the laser will wait for an
+        external trigger before starting.
+        """
 
         # Set start and end wavelengths
         self.sweep_start_wavelength(start)
@@ -172,7 +197,8 @@ class TSL550:
 
             self.sweep_step_time(time)
 
-        self.sweep_set_mode(continuous=continuous, twoway=twoway, trigger=trigger, const_freq_step=False)
+        self.sweep_set_mode(continuous=continuous, twoway=twoway,
+                            trigger=trigger, const_freq_step=False)
 
         if not self.is_on: # Make sure the laser is on
             self.on()
@@ -181,8 +207,33 @@ class TSL550:
 
     def sweep_frequency(self, start, stop, duration, number=1, delay=0
                          continuous=True, step_size=1, twoway=True, trigger=False):
+        """
+        Conduct a sweep between two frequencies. This method goes from
+        the start frequency to the stop frequency (units: terahertz)
+        in the time specified by duration (units: seconds). The sweep
+        is then repeated the number of times set in the number
+        parameter.
 
-        # Set start and end wavelengths
+        If delay (units: seconds) is specified, there is a pause of
+        that duration between each sweep.
+
+        If the parameter continuous is False, then the sweep will be
+        conducted in steps of fixed size as set by the step_size
+        parameter (units: terahertz).
+
+        If the twoway parameter is True then one sweep is considered
+        to be going from the start frequency to the stop frequency and
+        then back to the start; if it is False then one sweep consists
+        only of going from the start to the top, and the laser will
+        simply jump back to the start frequency at the start of the
+        next sweep.
+
+        If the trigger parameter is False then the sweep will execute
+        immediately. If it is true, the laser will wait for an
+        external trigger before starting.
+        """
+
+        # Set start and end frequencies
         self.sweep_start_frequency(start)
         self.sweep_end_frequency(stop)
 
@@ -204,7 +255,8 @@ class TSL550:
 
             self.sweep_step_time(time)
 
-        self.sweep_set_mode(continuous=continuous, twoway=twoway, trigger=trigger, const_freq_step=True)
+        self.sweep_set_mode(continuous=continuous, twoway=twoway,
+                            trigger=trigger, const_freq_step=True)
 
         if not self.is_on: # Make sure the laser is on
             self.on()
