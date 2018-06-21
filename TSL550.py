@@ -240,6 +240,64 @@ class TSL550:
         response = self.write(command)
         return float(response)
 
+    def sweep_step_wavelength(self, val=None):
+        """
+        Set the size of each step in the stepwise sweep. If a new
+        value is not provided, the current one will be returned.
+        Units: nm
+        """
+
+        if val is not None:
+            command = "WW{:.4f}".format(val)
+        else:
+            command = "WW"
+
+        response = self.write(command)
+        return float(response)
+
+    def sweep_step_frequency(self, val=None):
+        """
+        Set the size of each step in the stepwise sweep when constant
+        frequency intervals are enabled. If a new value is not
+        provided, the current one will be returned. Units: THz
+        """
+
+        if val is not None:
+            command = "WF{:.5f}".format(val)
+        else:
+            command = "WF"
+
+        response = self.write(command)
+        return float(response)
+
+    def sweep_step_time(self, val=None):
+        """
+        Set the duration of each step in the stepwise sweep. If a new
+        value is not provided, the current one will be returned.
+        """
+
+        if val is not None:
+            command = "SB{:.1f}".format(val)
+        else:
+            command = "SB"
+
+        response = self.write(command)
+        return float(response)
+
+    def sweep_delay(self, val=None):
+        """
+        Set the time between consecutive sweeps in continuous mode. If
+        a new value is not provided, the current one will be returned. Units: s
+        """
+
+        if val is not None:
+            command = "SA{:.1f}".format(val)
+        else:
+            command = "SA"
+
+        response = self.write(command)
+        return float(response)
+
     def sweep_start_wavelength(self, val=None):
         if val is not None:
             command = "SS{:.4f}".format(val)
