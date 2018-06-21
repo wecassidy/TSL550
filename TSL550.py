@@ -213,6 +213,20 @@ class TSL550:
             "const_freq_step": mode_settings[3]
         }
 
+    def sweep_speed(self, val=None):
+        """
+        Set the speed of the continuous sweep, in nm/s. If a new value
+        is not provided, the current one will be returned..
+        """
+
+        if val is not None:
+            command = "SN{:.1f}".format(val)
+        else:
+            command = "SN"
+
+        response = self.write(command)
+        return float(response)
+
     def sweep_start_wavelength(self, val=None):
         if val is not None:
             command = "SS{:.4f}".format(val)
