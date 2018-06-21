@@ -69,6 +69,15 @@ class TSL550:
 
         return response
 
+    def _set_var(self, name, precision, val):
+        if val is not None:
+            command = ("{}{:."+str(precision)+"f}").format(name, val)
+        else:
+            command = name
+
+        response = self.write(command)
+        return float(response)
+
     def on(self):
         """Turn on the laser diode"""
 
@@ -87,13 +96,7 @@ class TSL550:
         specified, return the current one. Units: nm.
         """
 
-        if val is not None:
-            command = "WA{:.4f}".format(val) # Put the value rounded to 4 decimal places
-        else:
-            command = "WA"
-
-        response = self.write(command)
-        return float(response)
+        return self._set_var("WA", 4, val)
 
     def frequency(self, val=None):
         """
@@ -101,13 +104,7 @@ class TSL550:
         specified, return the current one. Units: THz.
         """
 
-        if val is not None:
-            command = "FQ{:.5f}".format(val) # Put the value rounded to 4 decimal places
-        else:
-            command = "FQ"
-
-        response = self.write(command)
-        return float(response)
+        return self._set_var("FQ", 5, val)
 
     def power_mW(self, val=None):
         """
@@ -115,13 +112,7 @@ class TSL550:
         specified, return the current one.
         """
 
-        if val is not None:
-            command = "LP{:.2f}".format(val)
-        else:
-            command = "LP"
-
-        response = self.write(command)
-        return float(response)
+        return self._set_var("LP", 2, val)
 
     def power_dBm(self, val=None):
         """
@@ -129,13 +120,7 @@ class TSL550:
         is not specified, return the current one.
         """
 
-        if val is not None:
-            command = "OP{:.2f}".format(val)
-        else:
-            command = "OP"
-
-        response = self.write(command)
-        return float(response)
+        return self._set_var("OP", 2, val)
 
     def power_auto(self):
         """Turn on automatic power control."""
@@ -232,13 +217,7 @@ class TSL550:
         is not provided, the current one will be returned.
         """
 
-        if val is not None:
-            command = "SN{:.1f}".format(val)
-        else:
-            command = "SN"
-
-        response = self.write(command)
-        return float(response)
+        return self._set_var("SN", 1, val)
 
     def sweep_step_wavelength(self, val=None):
         """
@@ -247,13 +226,7 @@ class TSL550:
         Units: nm
         """
 
-        if val is not None:
-            command = "WW{:.4f}".format(val)
-        else:
-            command = "WW"
-
-        response = self.write(command)
-        return float(response)
+        return self._set_var("WW", 4, val)
 
     def sweep_step_frequency(self, val=None):
         """
@@ -262,13 +235,7 @@ class TSL550:
         provided, the current one will be returned. Units: THz
         """
 
-        if val is not None:
-            command = "WF{:.5f}".format(val)
-        else:
-            command = "WF"
-
-        response = self.write(command)
-        return float(response)
+        return self._set_var("WF", 5, val)
 
     def sweep_step_time(self, val=None):
         """
@@ -276,13 +243,7 @@ class TSL550:
         value is not provided, the current one will be returned.
         """
 
-        if val is not None:
-            command = "SB{:.1f}".format(val)
-        else:
-            command = "SB"
-
-        response = self.write(command)
-        return float(response)
+        return self._set_var("SB", 1, val)
 
     def sweep_delay(self, val=None):
         """
@@ -290,46 +251,16 @@ class TSL550:
         a new value is not provided, the current one will be returned. Units: s
         """
 
-        if val is not None:
-            command = "SA{:.1f}".format(val)
-        else:
-            command = "SA"
-
-        response = self.write(command)
-        return float(response)
+        return self._set_var("SA", 1, val)
 
     def sweep_start_wavelength(self, val=None):
-        if val is not None:
-            command = "SS{:.4f}".format(val)
-        else:
-            command = "SS"
-
-        response = self.write(command)
-        return float(response)
+        return self._set_var("SS", 4, val)
 
     def sweep_start_frequency(self, val=None):
-        if val is not None:
-            command = "FS{:.5f}".format(val)
-        else:
-            command = "FS"
-
-        response = self.write(command)
-        return float(response)
+        return self._set_var("FS", 5, val)
 
     def sweep_end_wavelength(self, val=None):
-        if val is not None:
-            command = "SE{:.4f}".format(val)
-        else:
-            command = "SE"
-
-        response = self.write(command)
-        return float(response)
+        return self._set_var("SE", 4, val)
 
     def sweep_end_frequency(self, val=None):
-        if val is not None:
-            command = "FF{:.5f}".format(val)
-        else:
-            command = "FF"
-
-        response = self.write(command)
-        return float(response)
+        return self._set_var("FF", 5, val)
