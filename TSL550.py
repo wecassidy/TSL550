@@ -3,7 +3,7 @@ import sys
 import serial
 
 class TSL550:
-    # continuous, two-way, trigger, constant frequency interval
+    # continuous, two-way, external trigger, constant frequency interval
     SWEEP_MODE_MAP = {
         (True, False, False, False): 1,
         (True, True, False, False): 2,
@@ -102,7 +102,7 @@ class TSL550:
         """
 
         if val is not None:
-            command = "FQ{:.4f}".format(val) # Put the value rounded to 4 decimal places
+            command = "FQ{:.5f}".format(val) # Put the value rounded to 4 decimal places
         else:
             command = "FQ"
 
@@ -148,6 +148,31 @@ class TSL550:
 
         self.power_control = "manual"
         self.write("AO")
+
+    def sweep(self, num=1):
+        """
+        Sweep between two wavelengths one or more times. Set the start
+        and end wavelengths with
+        sweep_(start|end)_(wavelength|frequency), and the sweep
+        operation mode with sweep_set_mode.
+        """
+
+        self.write("SZ{:d}".format(num)) # Set number of sweeps
+        self.write("SG") # Start sweeping
+
+    def sweep_pause(self):
+        """
+        Pause the sweep. Use sweep_resume to resume.
+        """
+
+        self.write("SP")
+
+    def sweep_resume(self):
+        """
+        Resume a paused sweep.
+        """
+
+        self.write("SR")
 
     def sweep_set_mode(self, continuous=True, twoway=True, trigger=False, const_freq_step=False):
         r"""
