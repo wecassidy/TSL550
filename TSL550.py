@@ -20,6 +20,13 @@ class TSL550:
     }
     SWEEP_MODE_MAP_REV = {num: settings for settings, num in SWEEP_MODE_MAP.items()}
 
+    # Sweep mode statuses
+    SWEEP_OFF = 0
+    SWEEP_RUNNING = 1
+    SWEEP_PAUSED = 2
+    SWEEP_TRIGGER_WAIT = 3
+    SWEEP_JUMP = 4
+
     def __init__(self, address, baudrate=9600, terminator="\r"):
         """
         Connect to the TSL550. Address is the serial port, baudrate
@@ -70,6 +77,11 @@ class TSL550:
         return response
 
     def _set_var(self, name, precision, val):
+        """
+        Generic function to set a floating-point variable on the
+        laser, or return the current value.
+        """
+
         if val is not None:
             command = ("{}{:."+str(precision)+"f}").format(name, val)
         else:
@@ -171,6 +183,22 @@ class TSL550:
             self.sweep_pause()
 
         self.write("SQ")
+
+    def sweep_status(self):
+        """
+        Check on the current condition of the sweeping function. It
+        will return one of TSL550.SWEEP_OFF, TSL550.SWEEP_RUNNING,
+        TSL550.SWEEP_PAUSED, TSL550.SWEEP_TRIGGER_WAIT,
+        TSL550.SWEEP_JUMP. The first three states are
+        self-explanatory, but the last two require more detail. If the
+        status is TSL550.SWEEP_TRIGGER_WAIT, that means that the sweep
+        has been set to start on an external trigger and that trigger
+        has not yet been received. If the status is TSL550.SWEEP_JUMP,
+        that means that the laser is transitioning between the end of
+        one sweep and the start of the next in one-way sweep mode.
+        """
+
+        return int(self.write("SK"))
 
     def sweep_set_mode(self, continuous=True, twoway=True, trigger=False, const_freq_step=False):
         r"""
