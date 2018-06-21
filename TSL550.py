@@ -174,6 +174,19 @@ class TSL550:
 
         self.write("SR")
 
+    def sweep_stop(self, immediate=True):
+        """
+        Prematurely quit a sweep. If the parameter immediate is True,
+        the sweep will stop at once. If the parameter is False and the
+        sweep is continuous, the sweep will stop once if finishes the
+        current sweep.
+        """
+
+        if immediate:
+            self.sweep_pause()
+
+        self.write("SQ")
+
     def sweep_set_mode(self, continuous=True, twoway=True, trigger=False, const_freq_step=False):
         r"""
         Set the mode of the sweep. Options:
@@ -216,7 +229,7 @@ class TSL550:
     def sweep_speed(self, val=None):
         """
         Set the speed of the continuous sweep, in nm/s. If a new value
-        is not provided, the current one will be returned..
+        is not provided, the current one will be returned.
         """
 
         if val is not None:
