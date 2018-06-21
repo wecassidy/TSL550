@@ -1,3 +1,4 @@
+from __future__ import division
 import sys
 
 import serial
@@ -146,7 +147,71 @@ class TSL550:
         self.power_control = "manual"
         self.write("AO")
 
-    def sweep(self, num=1):
+    def sweep_wavelength(self, start, stop, duration, number=1, delay=0
+                         continuous=True, step_size=1, twoway=True, trigger=False):
+
+        # Set start and end wavelengths
+        self.sweep_start_wavelength(start)
+        self.sweep_end_wavelength(stop)
+
+        # Set timing
+        self.sweep_delay(delay)
+        if continuous: # Calculate speed
+            speed = abs(stop - start) / duration
+
+            if twoway: # Need to go twice as fast to go up then down in the same time
+                speed *= 2
+
+            self.sweep_speed(speed)
+        else: # Calculate time per step
+            steps = abs(stop - start) / step_size
+            time = duration / steps
+
+            if twoway: # Need to go twice as fast to go up then down in the same time
+                time /= 2
+
+            self.sweep_step_time(time)
+
+        self.sweep_set_mode(continuous=continuous, twoway=twoway, trigger=trigger, const_freq_step=False)
+
+        if not self.is_on: # Make sure the laser is on
+            self.on()
+
+        self.sweep_start(number)
+
+    def sweep_frequency(self, start, stop, duration, number=1, delay=0
+                         continuous=True, step_size=1, twoway=True, trigger=False):
+
+        # Set start and end wavelengths
+        self.sweep_start_frequency(start)
+        self.sweep_end_frequency(stop)
+
+        # Set timing
+        self.sweep_delay(delay)
+        if continuous: # Calculate speed
+            speed = abs(stop - start) / duration
+
+            if twoway: # Need to go twice as fast to go up then down in the same time
+                speed *= 2
+
+            self.sweep_speed(speed)
+        else: # Calculate time per step
+            steps = abs(stop - start) / step_size
+            time = duration / steps
+
+            if twoway: # Need to go twice as fast to go up then down in the same time
+                time /= 2
+
+            self.sweep_step_time(time)
+
+        self.sweep_set_mode(continuous=continuous, twoway=twoway, trigger=trigger, const_freq_step=True)
+
+        if not self.is_on: # Make sure the laser is on
+            self.on()
+
+        self.sweep_start(number)
+
+    def sweep_start(self, num=1):
         """
         Sweep between two wavelengths one or more times. Set the start
         and end wavelengths with
