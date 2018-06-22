@@ -147,8 +147,9 @@ class TSL550:
         self.power_control = "manual"
         self.write("AO")
 
-    def sweep_wavelength(self, start, stop, duration, number=1, delay=0,
-                         continuous=True, step_size=1, twoway=True, trigger=False):
+    def sweep_wavelength(self, start, stop, duration, number=1,
+                         delay=0, continuous=True, step_size=1,
+                         twoway=False, trigger=False):
         r"""
         Conduct a sweep between two wavelengths. This method goes from
         the start wavelength to the stop wavelength (units:
@@ -223,8 +224,9 @@ class TSL550:
 
         self.sweep_start(number)
 
-    def sweep_frequency(self, start, stop, duration, number=1, delay=0,
-                         continuous=True, step_size=1, twoway=True, trigger=False):
+    def sweep_frequency(self, start, stop, duration, number=1,
+                        delay=0, continuous=True, step_size=1,
+                        twoway=False, trigger=False):
         r"""
         Conduct a sweep between two frequencies. This method goes from
         the start frequency to the stop frequency (units: terahertz).
