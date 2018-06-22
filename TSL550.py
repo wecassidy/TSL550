@@ -152,9 +152,8 @@ class TSL550:
         r"""
         Conduct a sweep between two wavelengths. This method goes from
         the start wavelength to the stop wavelength (units:
-        manometres) in the time specified by duration (units:
-        seconds). The sweep is then repeated the number of times set
-        in the number parameter.
+        manometres). The sweep is then repeated the number of times
+        set in the number parameter.
 
         If delay (units: seconds) is specified, there is a pause of
         that duration between each sweep.
@@ -162,6 +161,11 @@ class TSL550:
         If the parameter continuous is False, then the sweep will be
         conducted in steps of fixed size as set by the step_size
         parameter (units: nanometres).
+
+        In continuous mode, the duration is interpreted as the time
+        for one sweep. In stepwise mode, it is used as the dwell time
+        for each step. In both cases it has units of seconds and
+        should be specified in 100 microsecond intervals.
 
         If the twoway parameter is True then one sweep is considered
         to be going from the start wavelength to the stop wavelength
@@ -177,16 +181,16 @@ class TSL550:
         To illustrate the different sweep modes:
 
             Continuous, one-way    Continuous, two-way
-                /   /                  /\    /\      <-- stop wavelength
+                /   /                  /\    /\      <-- stop frequency
                /   /                  /  \  /  \
-              /   /                  /    \/    \    <-- start wavelength
+              /   /                  /    \/    \    <-- start frequency
               <-> duration           <----> duration
 
             Stepwise, one-way      Stepwise, two-way
-                  _|     _|              _||_        _||_      <-- stop wavelength
-                _|     _|              _|    |_    _|    |_ } step size
-              _|     _|              _|        |__|        |_  <-- start wavelength
-              <----> duration        <----------> duration
+                    __|      __|              _||_        _||_      <-- stop frequency
+                 __|      __|               _|    |_    _|    |_ } step size
+              __|      __|               _|        |__|        |_  <-- start frequency
+              <-> duration               <> duration
 
             Continuous, one-way, delay    Continuous, two-way, delay
                 /     /                       /\       /\
@@ -208,14 +212,8 @@ class TSL550:
                 speed *= 2
 
             self.sweep_speed(speed)
-        else: # Calculate time per step
-            steps = abs(stop - start) / step_size
-            time = duration / steps
-
-            if twoway: # Need to go twice as fast to go up then down in the same time
-                time /= 2
-
-            self.sweep_step_time(time)
+        else: # Interpret as time per step
+            self.sweep_step_time(duration)
 
         self.sweep_set_mode(continuous=continuous, twoway=twoway,
                             trigger=trigger, const_freq_step=False)
@@ -229,10 +227,9 @@ class TSL550:
                          continuous=True, step_size=1, twoway=True, trigger=False):
         r"""
         Conduct a sweep between two frequencies. This method goes from
-        the start frequency to the stop frequency (units: terahertz)
-        in the time specified by duration (units: seconds). The sweep
-        is then repeated the number of times set in the number
-        parameter.
+        the start frequency to the stop frequency (units: terahertz).
+        The sweep is then repeated the number of times set in the
+        number parameter.
 
         If delay (units: seconds) is specified, there is a pause of
         that duration between each sweep.
@@ -240,6 +237,11 @@ class TSL550:
         If the parameter continuous is False, then the sweep will be
         conducted in steps of fixed size as set by the step_size
         parameter (units: terahertz).
+
+        In continuous mode, the duration is interpreted as the time
+        for one sweep. In stepwise mode, it is used as the dwell time
+        for each step. In both cases it has units of seconds and
+        should be specified in 100 microsecond intervals.
 
         If the twoway parameter is True then one sweep is considered
         to be going from the start frequency to the stop frequency and
@@ -261,10 +263,10 @@ class TSL550:
               <-> duration           <----> duration
 
             Stepwise, one-way      Stepwise, two-way
-                  _|     _|              _||_        _||_      <-- stop frequency
-                _|     _|              _|    |_    _|    |_ } step size
-              _|     _|              _|        |__|        |_  <-- start frequency
-              <----> duration        <----------> duration
+                    __|      __|              _||_        _||_      <-- stop frequency
+                 __|      __|               _|    |_    _|    |_ } step size
+              __|      __|               _|        |__|        |_  <-- start frequency
+              <-> duration               <> duration
 
             Continuous, one-way, delay    Continuous, two-way, delay
                 /     /                       /\       /\
@@ -280,23 +282,17 @@ class TSL550:
         # Set timing
         self.sweep_delay(delay)
         if continuous: # Calculate speed
-            speed = abs(stop - start) / duration
+            speed = abs(3e8/stop - 3e8/start) / duration # Convert to wavelength
 
             if twoway: # Need to go twice as fast to go up then down in the same time
                 speed *= 2
 
             self.sweep_speed(speed)
-        else: # Calculate time per step
-            steps = abs(stop - start) / step_size
-            time = duration / steps
-
-            if twoway: # Need to go twice as fast to go up then down in the same time
-                time /= 2
-
-            self.sweep_step_time(time)
+        else: # Interpret as time per step
+            self.sweep_step_time(duration)
 
         self.sweep_set_mode(continuous=continuous, twoway=twoway,
-                            trigger=trigger, const_freq_step=True)
+                            trigger=trigger, const_freq_step=not continuous)
 
         if not self.is_on: # Make sure the laser is on
             self.on()
